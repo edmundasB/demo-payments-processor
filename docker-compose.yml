@@ -1,0 +1,43 @@
+version: '3'
+services:
+    payments:
+        container_name: payments
+        build:
+            context: ./payment-processor
+            dockerfile: Dockerfile
+        image: config-server:latest
+        networks:
+            - default
+        ports:
+            - "8081:8081"
+        depends_on:
+            - rabbitmq
+        environment:
+            - SPRING_RABBITMQ_HOST=rabbitmq
+            - SPRING_H2_CONSOLE_SETTINGS_WEB-ALLOW-OTHERS=true
+            - SPRING_DATASOURCE_URL=jdbc:h2:mem:payments
+    dummy:
+        container_name: dummy
+        build:
+            context: ./dummy-service
+            dockerfile: Dockerfile
+        image: config-server:latest
+        networks:
+            - default
+        ports:
+            - "8082:8082"
+        depends_on:
+            - rabbitmq
+        environment:
+            - SPRING_RABBITMQ_HOST=rabbitmq
+    rabbitmq:
+        container_name: rabbitmq
+        image: rabbitmq:management
+        hostname: "rabbitmq"
+        networks:
+            - default
+        ports:
+          - "5672:5672"
+          - "15672:15672"
+        volumes:
+            - ./rabbitmq-isolated.conf:/etc/rabbitmq/rabbitmq.config
