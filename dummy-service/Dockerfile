@@ -4,7 +4,7 @@ FROM maven:alpine
 WORKDIR /app
 ADD pom.xml /app
 
-RUN mvn clean install
+RUN mvn clean package
 
 EXPOSE 8082
 ADD ./target/dummy-0.0.1-SNAPSHOT.jar dummy.jar
